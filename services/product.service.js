@@ -1,6 +1,7 @@
 const faker = require('faker');
 const boom = require('@hapi/boom');
 const pool = require('./../libs/pooling');
+const poolSeq = require('./../libs/sequerlize');
 
 
 class ProductsService {
@@ -11,6 +12,7 @@ class ProductsService {
     this.pool = pool;
     //Listener
     this.pool.on('Error',(err)=>console.error(err));
+
   }
 
   generate() {
@@ -35,11 +37,33 @@ class ProductsService {
     return newProduct;
   }
 
+
+  /*
   async  find() {
     const query = 'SELECT * FROM tasks';
     const rta = await this.pool.query(query);
     return rta.rows;
   }
+  */
+
+  //La conexión ahora será por el ORM Sequelize
+  async  find() {
+    const query = 'SELECT * FROM tasks';
+
+    //const rta = await poolSeq.query(query);
+
+    //La info la maneja también de esta manera 'mas enriquecedora':
+    const [data, metadata] = await poolSeq.query(query);
+    /*
+    return {
+      data,
+      metadata
+    }
+    */
+   //Sin embargo, enviamos sólamente la data:
+   return data;
+  }
+
 
   async findOne(id) {
     const product = this.products.find(item => item.id === id);
